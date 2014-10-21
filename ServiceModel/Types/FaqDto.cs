@@ -1,4 +1,6 @@
 ﻿using System;
+using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson.Serialization.IdGenerators;
 
 namespace ServiceModel
 {
@@ -8,8 +10,9 @@ namespace ServiceModel
 		{
 
 		}
-
-		public int Id { get; set; }
+			
+		[BsonId(IdGenerator=typeof(MongoDB.Bson.Serialization.IdGenerators.GuidGenerator))]
+		public Guid Id { get ; set ; }
 		public string Question { get; set; }
 		public string Answer { get; set; }
 		public string Category { get; set; }
