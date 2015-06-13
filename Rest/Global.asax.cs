@@ -4,7 +4,13 @@ using ServiceStack.Api.Swagger;
 using ServiceStack.Text;
 using System.Configuration;
 using ServiceInterface;
-
+using ServiceStack.ServiceInterface;
+using ServiceStack.ServiceInterface.Auth;
+using ServiceStack.Configuration;
+using ServiceStack.CacheAccess;
+using ServiceStack.CacheAccess.Providers;
+using ServiceStack.OrmLite;
+using ServiceStack.ServiceInterface.Cors;
 
 namespace Rest
 {
@@ -28,6 +34,49 @@ namespace Rest
 				//register any dependencies your services use, e.g:
 				//container.Register<ICacheClient>(new MemoryCacheClient());
 				Plugins.Add (new SwaggerFeature());
+				Plugins.Add (new CorsFeature (allowedHeaders:"Content-Type, Authorization"));
+
+				ServiceStack.Text.JsConfig.DateHandler = ServiceStack.Text.JsonDateHandler.ISO8601;
+
+				ConfigureAuth (container);
+
+				RequestFilters.Add((httpReq, httpRes, requestDto) =>
+					{
+						httpRes.AddHeader("Access-Control-Allow-Origin", "*");
+
+						if (httpReq.HttpMethod == "OPTIONS")
+						{
+							httpRes.EndRequestWithNoContent();
+						}
+					});
+
+			}
+
+			public void ConfigureAuth(Funq.Container container)
+			{
+				var appSettings = new AppSettings ();
+
+				var dbFactory = new OrmLiteConnectionFactory (ConfigurationManager.AppSettings["authConnect"], false, ServiceStack.OrmLite.MySqlDialect.Provider);
+
+
+				container.Register<ICacheClient> (new MemoryCacheClient ());
+
+				Plugins.Add (new AuthFeature (() => new AuthUserSession (),
+					new IAuthProvider[] {
+						new FacebookAuthProvider(appSettings),
+						new TwitterAuthProvider (appSettings),
+						new CredentialsAuthProvider ()
+					}
+						) {HtmlRedirect=null});
+
+				Plugins.Add(new RegistrationFeature());
+
+				var userRep = new OrmLiteAuthRepository (dbFactory);
+				container.Register<IUserAuthRepository>(userRep);
+
+				userRep.CreateMissingTables ();
+
+
 			}
 		}
 

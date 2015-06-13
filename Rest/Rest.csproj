@@ -51,6 +51,15 @@
       <HintPath>..\Frameworks\ServiceStack\ServiceStack.dll</HintPath>
     </Reference>
     <Reference Include="System.Configuration" />
+    <Reference Include="ServiceStack.OrmLite">
+      <HintPath>..\Frameworks\ServiceStack\ServiceStack.OrmLite.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite.MySql">
+      <HintPath>..\Frameworks\ServiceStack\ServiceStack.OrmLite.MySql.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data">
+      <HintPath>..\Frameworks\MySqlData\bin\MySql.Data.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
